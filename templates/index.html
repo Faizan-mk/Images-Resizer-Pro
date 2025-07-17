@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Image Resizer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="neon-bg min-h-screen flex items-center justify-center p-4">
+    <!-- Animated background particles -->
+    <div class="particles"></div>
+    
+    <!-- Main Container -->
+    <div class="w-full max-w-4xl neon-container">
+        <!-- Header -->
+        <div class="neon-header">
+            <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-image text-4xl"></i>
+                <div>
+                    <h1 class="neon-title">Image Resizer Pro</h1>
+                    <p class="neon-subtitle">Transform your images </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="neon-content">
+            <!-- File Upload Section -->
+            <div class="mb-8">
+                <div id="drop-zone" class="neon-drop-zone">
+                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <div class="neon-icon">
+                        <i class="fas fa-cloud-upload-alt text-6xl"></i>
+                    </div>
+                    <p class="neon-text-primary">Drag & drop your image here</p>
+                    <p class="neon-text-secondary">or click to browse (JPG, PNG, GIF, max 16MB)</p>
+                    <div class="mt-4">
+                        <button class="neon-browse-btn" onclick="document.getElementById('file-input').click()">
+                            <i class="fas fa-folder-open mr-2"></i>Browse Files
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Info -->
+            <div id="file-info" class="neon-file-info hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-file-image text-2xl text-cyan-400"></i>
+                        <div>
+                            <p id="file-name" class="neon-file-name">filename.jpg</p>
+                            <p id="file-size" class="neon-file-size">1.2 MB</p>
+                        </div>
+                    </div>
+                    <button id="remove-file" class="neon-remove-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="mb-6 text-center">
+                <div id="preview-container" class="neon-preview-container hidden">
+                    <h3 class="neon-section-title mb-4">Image Preview</h3>
+                    <img id="preview" class="neon-preview" alt="Image preview">
+                    <div id="preview-info" class="neon-preview-info">
+                        <span id="preview-dimensions">1920 x 1080</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resize Options -->
+            <div class="mb-6">
+                <h3 class="neon-section-title">
+                    <i class="fas fa-cogs mr-2"></i>Resize Options
+                </h3>
+                
+                <!-- Preset Sizes -->
+                <div class="mb-4">
+                    <label class="neon-label">Quick Presets</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button class="neon-preset-btn" data-width="1920" data-height="1080">HD (1920×1080)</button>
+                        <button class="neon-preset-btn" data-width="1280" data-height="720">HD (1280×720)</button>
+                        <button class="neon-preset-btn" data-width="800" data-height="600">SVGA (800×600)</button>
+                        <button class="neon-preset-btn" data-width="640" data-height="480">VGA (640×480)</button>
+                    </div>
+                </div>
+
+                <!-- Custom Dimensions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="width" class="neon-label">
+                            <i class="fas fa-arrows-alt-h mr-1"></i>Width (px)
+                        </label>
+                        <input type="number" id="width" min="1" class="neon-input" placeholder="Enter width">
+                    </div>
+                    <div>
+                        <label for="height" class="neon-label">
+                            <i class="fas fa-arrows-alt-v mr-1"></i>Height (px)
+                        </label>
+                        <input type="number" id="height" min="1" class="neon-input" placeholder="Enter height">
+                    </div>
+                </div>
+                
+                <!-- Options -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="maintain-ratio" class="neon-checkbox" checked>
+                        <label for="maintain-ratio" class="neon-checkbox-label">
+                            <i class="fas fa-link mr-1"></i>Maintain aspect ratio
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="high-quality" class="neon-checkbox" checked>
+                        <label for="high-quality" class="neon-checkbox-label">
+                            <i class="fas fa-star mr-1"></i>High quality
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Button -->
+            <button id="process-btn" class="neon-button" disabled>
+                <span id="button-text">
+                    <i class="fas fa-magic mr-2"></i>Resize Image
+                </span>
+                <div id="spinner" class="hidden">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </button>
+
+            <!-- Progress Bar -->
+            <div id="progress-container" class="neon-progress-container hidden">
+                <div class="neon-progress-bar">
+                    <div id="progress-fill" class="neon-progress-fill"></div>
+                </div>
+                <p id="progress-text" class="neon-progress-text">Processing...</p>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result" class="mt-8 hidden">
+                <div class="neon-result">
+                    <h3 class="neon-result-title">
+                        <i class="fas fa-check-circle mr-2"></i>Resized Successfully!
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="neon-image-container">
+                            <img id="result-image" class="neon-result-image" alt="Resized Image">
+                        </div>
+                        <div class="neon-info">
+                            <div class="neon-info-item">
+                                <p class="neon-info-label">
+                                    <i class="fas fa-expand-arrows-alt mr-1"></i>Dimensions
+                                </p>
+                                <p class="neon-info-value" id="result-dimensions">-</p>
+                            </div>
+                            <div class="neon-info-item">
+                                <p class="neon-info-label">
+                                    <i class="fas fa-weight-hanging mr-1"></i>File Size
+                                </p>
+                                <p class="neon-info-value" id="result-size">-</p>
+                            </div>
+                            <div class="neon-info-item">
+                                <p class="neon-info-label">
+                                    <i class="fas fa-file-image mr-1"></i>Format
+                                </p>
+                                <p class="neon-info-value">Same as original</p>
+                            </div>
+                            <div class="neon-info-item">
+                                <p class="neon-info-label">
+                                    <i class="fas fa-clock mr-1"></i>Processing Time
+                                </p>
+                                <p class="neon-info-value" id="result-time">-</p>
+                            </div>
+                            <div class="flex space-x-3 mt-4">
+                                <a id="download-btn" download class="neon-download-btn">
+                                    <i class="fas fa-download mr-2"></i>Download
+                                </a>
+                                <button id="new-image-btn" class="neon-secondary-btn">
+                                    <i class="fas fa-plus mr-2"></i>New Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="neon-toast hidden">
+        <div class="flex items-center">
+            <i id="toast-icon" class="fas fa-info-circle w-6 h-6 mr-3"></i>
+            <span id="toast-message" class="font-medium">Operation completed successfully!</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
